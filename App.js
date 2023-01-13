@@ -1,188 +1,180 @@
-/* eslint-disable keyword-spacing */
-/* eslint-disable semi */
-/* eslint-disable eol-last */
-/* eslint-disable no-trailing-spaces */
-/* eslint-disable no-unused-vars */
-/* eslint-disable prettier/prettier */
-/* eslint-disable quotes */
-/* eslint-disable comma-dangle */
+import * as React from 'react';
+import {StyleSheet, Text, View, Dimensions} from 'react-native';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {DraxProvider, DraxView, DraxList} from 'react-native-drax';
 
-import * as React from "react";
-import { StyleSheet, View , Text , Dimensions } from "react-native";
-import { useState } from "react";
-import { DraxProvider, DraxView, DraxList } from 'react-native-drax';
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+const gestureRootViewStyle = {flex: 1};
 
-const gesturRootViewStyle = { flex : 1 };
-
-function App(){
-
-  const DraggableList = [
+export default function App() {
+  const draggableItemList = [
     {
-      "id": 1,
-      "name": "A",
-      "background_color": "red"
+      id: 9,
+      name: 'M',
+      background_color: 'red',
     },
     {
-      "id": 2,
-      "name": "B",
-      "background_color": "orange"
+      id: 10,
+      name: 'N',
+      background_color: 'pink',
     },
     {
-      "id": 3,
-      "name": "C",
-      "background_color": "yellow"
+      id: 11,
+      name: 'O',
+      background_color: 'orange',
     },
     {
-      "id": 4,
-      "name": "D",
-      "background_color": "blue"
+      id: 12,
+      name: 'P',
+      background_color: '#aaaaff',
+    },
+  ];
+  const FirstReceivingItemList = [
+    {
+      id: 13,
+      name: 'M',
+      background_color: '#ffaaff',
     },
     {
-      "id": 5,
-      "name": "E",
-      "background_color": "green"
+      id: 14,
+      name: 'N',
+      background_color: '#ffaaff',
     },
     {
-      "id": 6,
-      "name": "F",
-      "background_color": "pink"
+      id: 15,
+      name: 'O',
+      background_color: '#ffaaff',
     },
     {
-      "id": 7,
-      "name": "G",
-      "background_color": "red"
+      id: 16,
+      name: 'P',
+      background_color: '#ffaaff',
     },
-    {
-      "id": 8,
-      "name": "H",
-      "background_color": "blue"
-    },
-    {
-      "id": 9,
-      "name": "I",
-      "background_color": "green"
-    },
-    {
-      "id": 10,
-      "name": "J",
-      "background_color": "pink"
-    },
-    {
-      "id": 11,
-      "name": "K",
-      "background_color": "yellow"
-    },
-    {
-      "id": 1,
-      "name": "L",
-      "background_color": "red"
-    }
- ]
- const FirstReceivingItemList = [
-    {
-      "id": 13,
-      "name": "M",
-      "background_color": '#ffaaff'
-    },
-    {
-      "id": 14,
-      "name": "N",
-      "background_color": '#ffaaff'
-    },
-    {
-      "id": 15,
-      "name": "O",
-      "background_color": '#ffaaff'
-    },
-    {
-      "id": 16,
-      "name": "P",
-      "background_color": '#ffaaff'
-    }
   ];
 
-  const [draggableList, setDraggableList] = useState(DraggableList)
-  const [recievingList, setReceivingList] = useState(FirstReceivingItemList)
+  const [receivingItemList, setReceivedItemList] = React.useState(
+    FirstReceivingItemList,
+  );
+  const [dragItemMiddleList, setDragItemListMiddle] =
+    React.useState(draggableItemList);
 
-  const DragUIComponent = ({ item, index }) => {
+  const DragUIComponent = ({item, index}) => {
     return (
       <DraxView
-        style={[styles.centeredContent, styles.draggableBox, { backgroundColor: item.background_color }]}
+        style={[
+          styles.centeredContent,
+          styles.draggableBox,
+          {backgroundColor: item.background_color},
+        ]}
         draggingStyle={styles.dragging}
         dragReleasedStyle={styles.dragging}
         hoverDraggingStyle={styles.hoverDragging}
         dragPayload={index}
         longPressDelay={150}
-        key={index}
-      >
+        key={index}>
         <Text style={styles.textStyle}>{item.name}</Text>
       </DraxView>
     );
-  }
+  };
 
-  const ReceivingZoneUIComponent = ({item, index}) =>{
-    return(
-      <DraxView 
-        style={[styles.centeredContent, styles.receivingZone, { backgroundColor: item.background_color }]}
+  const ReceivingZoneUIComponent = ({item, index}) => {
+    return (
+      <DraxView
+        style={[
+          styles.centeredContent,
+          styles.receivingZone,
+          {backgroundColor: item.background_color},
+        ]}
         receivingStyle={styles.receiving}
-
-        renderContent = {({viewState}) => {
-          const recievingDrag = viewState && viewState.recievingDrag;
-          const payload = recievingDrag && recievingDrag.payload;
-          
+        renderContent={({viewState}) => {
+          const receivingDrag = viewState && viewState.receivingDrag;
+          const payload = receivingDrag && receivingDrag.payload;
           return (
             <View>
               <Text style={styles.textStyle}>{item.name}</Text>
             </View>
           );
-        }}    
-        key = {index}
-        onReceiveDragDrop = {(event) => {
-            const selected_item = draggableList[event.dragged.payload];
-            const newReceivingList = [...recievingList];
-            newReceivingList[index] = selected_item;
-            setReceivingList(newReceivingList);
+        }}
+        key={index}
+        onReceiveDragDrop={event => {
+          let selected_item = dragItemMiddleList[event.dragged.payload];
+          let replaced_item = receivingItemList[index];
 
-            const newDraggableList = [...draggableList];
-            newDraggableList[event.dragged.payload] = recievingList[index];
-            setDraggableList(newDraggableList);
+          console.log('replaced_item', {replaced_item});
+          if (selected_item.name === replaced_item.name) {
+            console.log('The elements are same');
+            let newReceivingItemList = [...receivingItemList];
+
+            console.log(
+              'onReceiveDragDrop :: newReceivingItemList',
+              newReceivingItemList,
+            );
+            newReceivingItemList[index] = selected_item;
+            setReceivedItemList(newReceivingItemList);
+
+            let newDragItemMiddleList = dragItemMiddleList.filter(
+              (element, index) => index !== event.dragged.payload,
+            );
+
+            setDragItemListMiddle(newDragItemMiddleList);
+            // console.log(
+            //   'onReceiveDragDrop :: newDragItemMiddleList 1',
+            //   newDragItemMiddleList,
+            // );
+            // // newDragItemMiddleList[event.dragged.payload] =
+            // //   receivingItemList[index];
+            // console.log(
+            //   'onReceiveDragDrop :: newDragItemMiddleList 2',
+            //   newDragItemMiddleList,
+            // );
+            // setDragItemListMiddle(newDragItemMiddleList);
+          } else {
+            return false;
+          }
+          console.log('onReceiveDragDrop::index', selected_item, index);
+          console.log('onReceiveDragDrop :: payload', event.dragged.payload);
+        }}
+        onRejectDrop={event => {
+          // move the dragged item back to its original position
+          const draggedItem = dragItemMiddleList[event.dragged.payload];
+          const newList = [...dragItemMiddleList];
+          newList[event.dragged.payload] = draggedItem;
+          setDragItemListMiddle(newList);
         }}
       />
-      );
-  }
-
-  const FlatListItemSeperator = () => {
-    return (
-      <View style={styles.flatListItemSeperator} />
     );
-  }
+  };
+
+  const FlatListItemSeparator = () => {
+    return <View style={styles.itemSeparator} />;
+  };
 
   return (
-
-    <GestureHandlerRootView style= {gesturRootViewStyle}>
-    <View>
-      <Text style = {styles.headerStyle}> Drag and Drop</Text>
-    </View>
-    <DraxProvider>
-      <View style = {styles.container}>
-        <View style = {styles.receivingContainer}>
-          {recievingList.map((item,index) => ReceivingZoneUIComponent({item,index}))}
-        </View>
-        <View styles = {styles.draxListContainer}>
-          <DraxList 
-            data = {draggableList}
-            renderItemContent = {DragUIComponent}
-            keyExtractor = {(item,index) => index.toString()}
-            numColumns = {4}
-            ItemSeparatorComponent = {FlatListItemSeperator}
-            scrollEnabled = {true}  
-          />
-        </View>
+    <GestureHandlerRootView style={gestureRootViewStyle}>
+      <View>
+        <Text style={styles.headerStyle}>
+          {'Drag drop and swap between lists'}
+        </Text>
       </View>
-    </DraxProvider>
+      <DraxProvider>
+        <View style={styles.container}>
+          <View style={styles.receivingContainer}>
+            {receivingItemList.map((item, index) =>
+              ReceivingZoneUIComponent({item, index}),
+            )}
+          </View>
+          <View style={styles.draxListContainer}>
+            <DraxList
+              data={dragItemMiddleList}
+              renderItemContent={DragUIComponent}
+              keyExtractor={(item, index) => index.toString()}
+              numColumns={4}
+              ItemSeparatorComponent={FlatListItemSeparator}
+              scrollEnabled={true}
+            />
+          </View>
+        </View>
+      </DraxProvider>
     </GestureHandlerRootView>
-
   );
 }
 
@@ -197,25 +189,24 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   receivingZone: {
-    height: (Dimensions.get('window').width / 4) - 12,
+    height: Dimensions.get('window').width / 4 - 12,
     borderRadius: 10,
-    width: (Dimensions.get('window').width / 4) - 12,
+    width: Dimensions.get('window').width / 4 - 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 5
+    marginRight: 5,
   },
   receiving: {
     borderColor: 'red',
     borderWidth: 2,
   },
   draggableBox: {
-    width: (Dimensions.get('window').width / 4) - 12,
-    height: (Dimensions.get('window').width / 4) - 12,
+    width: Dimensions.get('window').width / 4 - 12,
+    height: Dimensions.get('window').width / 4 - 12,
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 5,
-    marginBottom: 5
   },
   dragging: {
     opacity: 0.2,
@@ -226,10 +217,10 @@ const styles = StyleSheet.create({
   },
   receivingContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly'
+    justifyContent: 'space-evenly',
   },
   itemSeparator: {
-    height: 15
+    height: 15,
   },
   draxListContainer: {
     padding: 5,
@@ -237,17 +228,15 @@ const styles = StyleSheet.create({
   },
   receivingZoneContainer: {
     padding: 5,
-    height: 100
+    height: 100,
   },
   textStyle: {
-    fontSize: 18
+    fontSize: 18,
   },
   headerStyle: {
-    marginTop: 30,
-    fontSize: 30,
+    marginTop: 20,
+    fontSize: 18,
     fontWeight: 'bold',
-    textAlign : 'center',
-  }
-})
-
-export default App
+    marginLeft: 20,
+  },
+});
